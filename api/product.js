@@ -1,15 +1,11 @@
-/* TODO
-   1. Move config file
-   2. Create http errors
- */
-
 const {Sequelize, DataTypes, Op} = require('sequelize')
-const pstgrs_conf = require('../config')
-const sequelize = new Sequelize(pstgrs_conf.database, pstgrs_conf.user, pstgrs_conf.password, {
-    host: pstgrs_conf.host,
+const pgConf = require('./config/postgress')
+const seqConf = require('./config/sequelize')
+const errors = require('./errors')
+const sequelize = new Sequelize(pgConf.database, pgConf.user, pgConf.password, {
+    host: pgConf.host,
     dialect: 'postgres'
 })
-const errors = require('./Errors')
 
 const Product = sequelize.define('Product', {
     id: {
@@ -37,8 +33,10 @@ const Product = sequelize.define('Product', {
     }
 }, {
     sequelize,
-    tableName: pstgrs_conf.database
+    tableName: pgConf.database
 })
+
+let sortMap = new Map()
 
 async function createProduct(sku, name, type, price) {
     let id
@@ -51,31 +49,42 @@ async function createProduct(sku, name, type, price) {
         })
         id = product.id
     } catch (error) {
-        console.log('Could not create this product in database:', error)
-        id = null
+        throw errors.dbCreateError()
     }
     return id
 }
 
-async function deleteProductById(id) {
-    try {
-        const product = await findProductById(id)
-        await product.destroy()
-    } catch (error) {
-        throw error
-    }
-}
+async function getAllProducts(sort, page) {
+    let order = []
+    sort.forEach(elem => {
+        const param = sortMap.get(elem)
+        if (param === undefined) {
+            throw errors.badUser()
+        }
+        order.push(param)
+    })
 
-async function deleteProductBySku(sku) {
+    const offset = (page - 1) * seqConf.pageLimit
+    if (offset < 0) {
+        throw errors.badUser()
+    }
+
     try {
-        const product = await findProductBySku(sku)
-        await product.destroy()
+        return await Product.findAll({
+            order: order,
+            limit: seqConf.pageLimit,
+            offset: offset
+        })
     } catch (error) {
-        throw error
+        throw errors.dbError()
     }
 }
 
 async function findProductById(id) {
+    if (id === undefined) {
+        throw errors.badUser()
+    }
+
     const product = await Product.findByPk(id)
     if (product === null) {
         throw errors.productNotFound('id', id)
@@ -84,9 +93,15 @@ async function findProductById(id) {
 }
 
 async function findProductBySku(sku) {
+    if (sku === undefined) {
+        throw errors.badUser()
+    }
+
     const product = await Product.findOne({
         where: {
-            sku: sku
+            sku: {
+                [Op.eq]: sku
+            }
         }
     })
     if (product === null) {
@@ -104,18 +119,24 @@ async function start() {
         return
     }
     try {
-        await Product.sync({force: true})
+        await Product.sync({alter: true})
         console.log('Table products has been successfully synchronised')
     } catch (error) {
         console.log('Unable to synchronise the products table. Remove connection with the database.')
         await sequelize.close()
     }
+
+    sortMap.set('type', ['type', 'ASC'])
+    sortMap.set('type_desc', ['type', 'DESC'])
+    sortMap.set('price', ['price', 'ASC'])
+    sortMap.set('price_desc', ['price', 'DESC'])
 }
 
 module.exports = {
     start,
     createProduct,
-    deleteProductById,
-    deleteProductBySku
+    findProductById,
+    findProductBySku,
+    getAllProducts,
 }
 

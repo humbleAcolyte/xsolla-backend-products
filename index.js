@@ -11,17 +11,13 @@ app.use(
     })
 )
 
-const errorHandler = (error, request, response, next) => {
-    response.sendStatus(error.status || 500)
-    console.log('Error status: ', error.status)
-    console.log('Message: ', error.message)
-}
-
 app.post('/products', api.createProduct)
-app.delete('/products/:id', api.deleteProductById)
-app.delete('/products/sku/:sku', api.deleteProductBySku)
+app.get('/products', api.readProducts, api.jsonConvert)
+app.get('/products/item', api.readProduct, api.jsonConvert)
+app.put('/products', api.updateProduct)
+app.delete('/products/item', api.deleteProduct)
 
-app.use(errorHandler)
+app.use(api.errorHandler)
 
 app.listen(port, (err) => {
     if (err) {
