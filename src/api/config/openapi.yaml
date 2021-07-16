@@ -1,0 +1,155 @@
+openapi: 3.0.0
+info:
+  title: Xsolla Test API
+  version: 1.0.0
+paths:
+  /products:
+    get:
+      summary: Returns a list of products.
+      parameters:
+        - in: query
+          name: sort
+          description: Sort order by type and/or price.
+          schema:
+            $ref: '#/components/schemas/Sort'
+        - in: query
+          name: page
+          description: Set offset.
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+          required: false
+      responses:
+        '200':
+          description: A JSON array of of products.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '400':
+          description:
+        '500':
+          description:
+    post:
+      summary: Returns id of created product.
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              items:
+                $ref: '#/components/schemas/Product'
+          application/json:
+            schema:
+              type: object
+              items:
+                $ref: '#/components/schemas/Product'
+      responses:
+        '201':
+          description: The new product's id.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+        '400':
+        '500':
+  /products/{id}:
+    get:
+      summary:
+      parameters:
+        - in: path
+          name: id
+          description:
+          schema:
+            type: integer
+          required: true
+    put:
+      summary: Changes a product by id.
+      parameters:
+        - in: path
+          name: id
+          description:
+          schema:
+            type: integer
+          required: true
+    delete:
+      summary:
+      parameters:
+        - in: path
+          name: id
+          description:
+          schema:
+            type: integer
+          required: true
+  /products/findBySku/{sku}:
+    get:
+      summary:
+      parameters:
+        - in: path
+          name: sku
+          description:
+          schema:
+            type: integer
+          required: true
+    put:
+      summary: Changes a product by id or sku.
+      parameters:
+        - in: path
+          name: sku
+          description:
+          schema:
+            type: integer
+          required: true
+    delete:
+      summary:
+      parameters:
+        - in: path
+          name: sku
+          description:
+          schema:
+            type: integer
+          required: true
+
+
+components:
+  schemas:
+    Product:
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        sku:
+          type: integer
+        name:
+          type: string
+        type:
+          type: string
+        price:
+          type: number
+      required:
+        - sku
+        - name
+        - type
+        - price
+    Sort:
+      type: string
+      enum:
+        - type
+        - type price
+        - type price_desc
+        - type_desc
+        - type_desc price
+        - type_desc price_desc
+        - price
+        - price type
+        - price type_desc
+        - price_desc
+        - price_desc type
+        - price_desc type_desc

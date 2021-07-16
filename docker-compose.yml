@@ -1,0 +1,25 @@
+version: "3.7"
+
+services:
+  api:
+    depends_on:
+      - db
+    build: src
+    ports:
+      - "3000:3000"
+    links:
+      - "db:database"
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./pgdata:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: products
+
+volumes:
+  pg-data:
+
