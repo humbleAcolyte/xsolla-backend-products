@@ -2,11 +2,12 @@ version: "3.7"
 
 services:
   api:
-    depends_on:
-      - db
     build: src
     ports:
       - "3000:3000"
+    depends_on:
+      db:
+        condition: service_healthy
     links:
       - "db:database"
   db:
@@ -19,6 +20,11 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: products
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   pg-data:

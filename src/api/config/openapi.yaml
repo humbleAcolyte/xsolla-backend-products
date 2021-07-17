@@ -30,9 +30,9 @@ paths:
                 items:
                   $ref: '#/components/schemas/Product'
         '400':
-          description:
-        '500':
-          description:
+          description: Bad request.
+        '5XX':
+          description: Unexpected error.
     post:
       summary: Returns id of created product.
       requestBody:
@@ -59,17 +59,32 @@ paths:
                   id:
                     type: integer
         '400':
-        '500':
+          description: Bad request.
+        '5XX':
+          description: Unexpected error.
+
   /products/{id}:
     get:
-      summary:
+      summary: Returns information about a product with the specified id.
       parameters:
         - in: path
           name: id
-          description:
+          description: The product id.
           schema:
             type: integer
           required: true
+      responses:
+        '200':
+          description: A product object.
+          schemas:
+            aplication/json:
+              $ref: '#/components/schemas/Product'
+        '400':
+          description: Bad request. Product id must be an integer and larger than 0.
+        '404':
+          description: A product with the specified ID was not found.
+        '5XX':
+          description: Unexpected error.
     put:
       summary: Changes a product by id.
       parameters:
@@ -79,6 +94,15 @@ paths:
           schema:
             type: integer
           required: true
+      responses:
+        '200':
+          description:
+        '400':
+          description:
+        '404':
+          description:
+        '5XX':
+          description:
     delete:
       summary:
       parameters:
@@ -88,6 +112,16 @@ paths:
           schema:
             type: integer
           required: true
+      responses:
+        '200':
+          description:
+        '400':
+          description:
+        '404':
+          description:
+        '5XX':
+          description:
+
   /products/findBySku/{sku}:
     get:
       summary:
@@ -116,8 +150,6 @@ paths:
           schema:
             type: integer
           required: true
-
-
 components:
   schemas:
     Product:
