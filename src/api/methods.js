@@ -35,7 +35,7 @@ const getProductBySku = (async (request, response, next) => {
 
 const getOneProduct = (async (request, response, next) => {
     const product = request.product
-    response.send(JSON.stringify(product, seqConf.exportFields, '\t'))
+    response.status(200).send(JSON.stringify(product, seqConf.exportFields, '\t'))
 })
 
 const getAllProducts = (async (request, response, next) => {
@@ -88,7 +88,7 @@ const changeProduct = (async (request, response, next) => {
         next (error)
         return
     }
-    response.sendStatus(200)
+    response.sendStatus(204)
 })
 
 const deleteProduct = (async (request, response, next) => {
@@ -99,7 +99,7 @@ const deleteProduct = (async (request, response, next) => {
         next(error)
         return
     }
-    response.sendStatus(200)
+    response.sendStatus(204)
 })
 
 const errorHandler = (error, request, response, next) => {

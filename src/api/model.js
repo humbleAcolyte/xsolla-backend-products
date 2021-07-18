@@ -52,7 +52,7 @@ async function createProduct(sku, name, type, price) {
         })
         id = product.id
     } catch (error) {
-        throw errors.dbError()
+        throw errors.badUser()
     }
     return id
 }

@@ -3,7 +3,7 @@ info:
   title: Xsolla Test API
   version: 1.0.0
 paths:
-  /products:
+  /api/v1/products:
     get:
       summary: Returns a list of products.
       parameters:
@@ -22,7 +22,7 @@ paths:
           required: false
       responses:
         '200':
-          description: A JSON array of of products.
+          description: A JSON array of products.
           content:
             application/json:
               schema:
@@ -30,9 +30,9 @@ paths:
                 items:
                   $ref: '#/components/schemas/Product'
         '400':
-          description: Bad request.
+          $ref: '#/components/responses/BadRequest'
         '5XX':
-          description: Unexpected error.
+          $ref: '#/components/responses/Unexpected'
     post:
       summary: Returns id of created product.
       requestBody:
@@ -40,17 +40,13 @@ paths:
         content:
           application/x-www-form-urlencoded:
             schema:
-              type: object
-              items:
-                $ref: '#/components/schemas/Product'
+              $ref: '#/components/schemas/Product'
           application/json:
             schema:
-              type: object
-              items:
-                $ref: '#/components/schemas/Product'
+              $ref: '#/components/schemas/Product'
       responses:
         '201':
-          description: The new product's id.
+          description: The id of the new product.
           content:
             application/json:
               schema:
@@ -63,96 +59,162 @@ paths:
         '5XX':
           description: Unexpected error.
 
-  /products/{id}:
+  /api/v1/products/{id}:
     get:
-      summary: Returns information about a product with the specified id.
+      summary: Returns product information with the specified id.
       parameters:
         - in: path
           name: id
-          description: The product id.
+          description: Product id.
           schema:
             type: integer
           required: true
       responses:
         '200':
-          description: A product object.
-          schemas:
-            aplication/json:
+          $ref: '#/components/responses/GetProductSuccese'
+        '400':
+          $ref: '#/components/responses/BadRequestById'
+        '404':
+          $ref: '#/components/responses/NotFoundById'
+        '5XX':
+          $ref: '#/components/responses/Unexpected'
+    put:
+      summary: Changes the product by id.
+      parameters:
+        - in: path
+          name: id
+          description: Product id.
+          schema:
+            type: integer
+          required: true
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
               $ref: '#/components/schemas/Product'
-        '400':
-          description: Bad request. Product id must be an integer and larger than 0.
-        '404':
-          description: A product with the specified ID was not found.
-        '5XX':
-          description: Unexpected error.
-    put:
-      summary: Changes a product by id.
-      parameters:
-        - in: path
-          name: id
-          description:
-          schema:
-            type: integer
-          required: true
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
       responses:
-        '200':
-          description:
+        '204':
+          $ref: '#/components/responses/ChangeProductSuccese'
         '400':
-          description:
+          $ref: '#/components/responses/BadRequest'
         '404':
-          description:
+          $ref: '#/components/responses/NotFoundById'
         '5XX':
-          description:
+          $ref: '#/components/responses/Unexpected'
     delete:
-      summary:
+      summary: Removes the product with the specified id.
       parameters:
         - in: path
           name: id
-          description:
+          description: Product id.
           schema:
             type: integer
           required: true
       responses:
-        '200':
-          description:
+        '204':
+          $ref: '#/components/responses/DeleteProductSuccese'
         '400':
-          description:
+          $ref: '#/components/responses/BadRequest'
         '404':
-          description:
+          $ref: '#/components/responses/NotFoundById'
         '5XX':
-          description:
+          $ref: '#/components/responses/Unexpected'
 
-  /products/findBySku/{sku}:
+  /api/v1/products/findBySku/{sku}:
     get:
-      summary:
+      summary: Returns information about a product with the specified sku.
       parameters:
         - in: path
           name: sku
-          description:
+          description: Product sku.
           schema:
             type: integer
           required: true
+      responses:
+        '200':
+          $ref: '#/components/responses/GetProductSuccese'
+        '400':
+          $ref: '#/components/responses/BadRequestBySku'
+        '404':
+          $ref: '#/components/responses/NotFoundBySku'
+        '5XX':
+          $ref: '#/components/responses/Unexpected'
     put:
-      summary: Changes a product by id or sku.
+      summary: Changes the product by sku.
       parameters:
         - in: path
           name: sku
-          description:
+          description: Product sku.
           schema:
             type: integer
           required: true
+      requestBody:
+        required: true
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Product'
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Product'
+      responses:
+        '204':
+          $ref: '#/components/responses/ChangeProductSuccese'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundBySku'
+        '5XX':
+          $ref: '#/components/responses/Unexpected'
     delete:
-      summary:
+      summary: Removes the product with the specified sku.
       parameters:
         - in: path
           name: sku
-          description:
+          description: The product's sku.
           schema:
             type: integer
           required: true
+      responses:
+        '204':
+          $ref: '#/components/responses/DeleteProductSuccese'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '404':
+          $ref: '#/components/responses/NotFoundBySku'
+        '5XX':
+          $ref: '#/components/responses/Unexpected'
 components:
+  responses:
+    GetProductSuccese:
+      description: A JSON product's object.
+      content:
+        aplication/json:
+          schema:
+            $ref: '#/components/schemas/Product'
+    NotFoundById:
+      description: The product with the specified id is not found.
+    NotFoundBySku:
+      description: The product with the specified sku is not found.
+    BadRequest:
+      description: Bad request.
+    BadRequestById:
+      description: Bad request. Product id must be an integer and larger than 0.
+    BadRequestBySku:
+      description: Bad request. Product sku must be an integer and more or equal to 0.
+    ChangeProductSuccese:
+      description: The product was successfully changed.
+    DeleteProductSuccese:
+      description: The product was successfully removed.
+    Unexpected:
+      description: Unexpected error.
   schemas:
     Product:
+      type: object
       properties:
         id:
           type: integer
@@ -165,11 +227,6 @@ components:
           type: string
         price:
           type: number
-      required:
-        - sku
-        - name
-        - type
-        - price
     Sort:
       type: string
       enum:
@@ -185,3 +242,32 @@ components:
         - price_desc
         - price_desc type
         - price_desc type_desc
+  requestBodies:
+    ProductPost:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            $ref: '#/components/schemas/Product'
+            required:
+              - sku
+              - name
+              - type
+              - price
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Product'
+            required:
+              - sku
+              - name
+              - type
+              - price
+    ProductPut:
+      required: true
+      content:
+        application/x-www-form-urlencoded:
+          schema:
+            $ref: '#/components/schemas/Product'
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Product'
