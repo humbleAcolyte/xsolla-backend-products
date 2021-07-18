@@ -1,5 +1,5 @@
 const {Sequelize, DataTypes, Op} = require('sequelize')
-const pgConf = require('./config/postgress')
+const pgConf = require('./config/postgres')
 const errors = require('./errors')
 const sequelize = new Sequelize({
     database: pgConf.database,
