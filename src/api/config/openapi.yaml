@@ -1,7 +1,11 @@
 openapi: 3.0.0
 info:
-  title: Xsolla Test API
+  title: Products RESTful API
   version: 1.0.0
+  description: API is the implementation of a product management system for e-commerce site.
+  externalDocs:
+    description: Find out more
+    url: http://github.com/humbleAcolyte/xsolla-backend-products
 paths:
   /api/v1/products:
     get:

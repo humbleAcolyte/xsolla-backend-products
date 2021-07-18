@@ -10,7 +10,5 @@ RUN npm install
 
 COPY api /api
 
-COPY wait-for-it.sh /api/wait-for-it.sh
-
 EXPOSE 3000
 CMD ["nodemon", "index.js"]
